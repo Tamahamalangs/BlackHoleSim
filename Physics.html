@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <title>Schwarschild Black Hole Orbits</title>
+   <!-- Apparently this is how you can add a comment in html -->
+</head>
+
+<body style="font-family:sans-serif; font-size:15px; width:600px; margin-left:auto; margin-right:auto; background-color:rgb(200,200,200);">
+
+   <!-- The normal tag for this is "<body>", but here once you use the "style" command, you may then add additional text which, as the name implies, styles the text-->
+
+<h1 style="font-size:24px; text-align:center; color:rgb(0,0,0);">
+   Newton's Cannon
+</h1>
+	
+<!-- This "a href=" command allows you to add a website link into the page. "Click here" is the text displayed for the link -->
+	
+<div style="width:500px; margin-left:auto; margin-right:auto; position:relative;">
+
+<!-- div is used to create an invisible box around the image we display see we can more easily manipulate its styling -->
+
+   <img src="NewtonDrawing.jpg" width="500" height="500" style="position:absolute;">
+
+<!-- The line above is used to place an image in the website. The file name is used, and then the width and height are 			specified -->
+   <canvas id="theCanvas" width="500" height="500" style="position:relative;">
+      Canvas not supported; please update your browser.
+   </canvas>
+	</div>
+
+<div style="text-align:center;">
+   <input type="button" value="Fire!" onclick="fireProjectile();">
+    Initial speed = <span id="speedReadout">3000</span> m/s
+   <input type="range" id="speedSlider" min="0" max="8000" step="100" value="3000" oninput="showSpeed();" onchange="showSpeed();">
+</div>
+
+<p style="color:rgb(50,70,100);">
+    I am currently using this as a test to learn how to create buttons and format the website correctly. I plan on creating a MUCH cleaner website with the actual idea for the black hole orbital pattern very soon, so please stay tuned! In the mean-time, try using the website and tell me what you think. Tell me if there is any feature you think would be nice to have on an educational website like this. Anything from design ideas, to formatting, to anything else, all ideas are welcome!
+</p>
+
+<script>
+   var speedReadout = document.getElementById("speedReadout");
+   var speedSlider = document.getElementById("speedSlider");
+   timer = window.setTimeout(moveProjectile, 1000/30);
+   var theCanvas = document.getElementById("theCanvas");
+   var theContext = theCanvas.getContext("2d");
+   var x, y, vx, vy;
+   var earthRadius = 6371000;   // meters
+   var mountainHeight = earthRadius * 0.165;  // chosen to match image
+   var x = 0;
+   var y = earthRadius + mountainHeight;
+moveProjectile();
+
+function drawProjectile(){
+   var metersPerPixel = earthRadius / (0.355 * theCanvas.width);
+   var pixelX = theCanvas.width/2 + x/metersPerPixel;
+   var pixelY = theCanvas.height/2 - y/metersPerPixel;
+   theContext.clearRect(0, 0, theCanvas.width, theCanvas.height);
+   theContext.beginPath();
+   theContext.arc(pixelX, pixelY, 5, 0, 2*Math.PI);
+   theContext.fillStyle = "red";
+   theContext.fill();
+}
+
+function moveProjectile() {
+    var newtonG = 6.67e-11;        // grav. constant in SI units
+    var earthMass = 5.97e24;       // kilograms
+    var dt = 5;                    // time step in seconds
+    var r = Math.sqrt(x*x + y*y);
+    if (r > earthRadius) {
+       var accel = newtonG * earthMass / (r * r);  // magnitude of a
+       var ax = -accel * x / r;
+       var ay = -accel * y / r;
+       vx += ax * dt;
+       vy += ay * dt;
+       var lastx = x;
+       x += vx * dt;
+       y += vy * dt;
+       drawProjectile();
+       if (!((lastx < 0) && (x >= 0))) {
+         window.setTimeout(moveProjectile, 1000/30);
+        }
+      }
+}
+function fireProjectile() {
+    window.clearTimeout(timer);
+    x = 0;
+    y = earthRadius + mountainHeight;
+    vx = Number(speedSlider.value);
+    vy = 0;
+    moveProjectile();
+}
+function showSpeed() {
+    speedReadout.innerHTML = speedSlider.value;
+}
+</script>
+
+<!-- The script tags create a space where you can use JavaScript to code the website-->
+
+</body>
+
+</html>
+ 
